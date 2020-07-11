@@ -11,16 +11,23 @@ ATank::ATank()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Root Object
 	if (!RootComponent)
 	{
 		RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("TankBase"));
 	}
 
+	// Direction of tank body
 	TankDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("TankDirection"));
-	TankDirection->AttachTo(RootComponent);
+	TankDirection->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, NAME_None);
 
+	// Sprite for tank body
 	TankSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("TankSprite"));
-	TankSprite->AttachTo(TankDirection);
+	TankSprite->AttachToComponent(TankDirection, FAttachmentTransformRules::SnapToTargetNotIncludingScale, NAME_None);
+
+	// Turret Attachement
+	ChildTurret = CreateDefaultSubobject<UChildActorComponent>(TEXT("Turret"));
+	ChildTurret->AttachToComponent(TankDirection, FAttachmentTransformRules::SnapToTargetNotIncludingScale, NAME_None);
 }
 
 // Called when the game starts or when spawned

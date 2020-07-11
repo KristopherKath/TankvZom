@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-//#include "Components/ArrowComponent.h"
-//#include "PaperSpriteComponent.h"
 #include "Tank.generated.h"
 
 class UArrowComponent;
@@ -41,4 +39,8 @@ private:
 	// Sprite for the tank body.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank", meta = (AllowPrivateAccess = "true"))
 	UPaperSpriteComponent* TankSprite;
+
+	// The actor used as the turret
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank", meta = (AllowPrivateAccess = "true"))
+	UChildActorComponent* ChildTurret;
 };
