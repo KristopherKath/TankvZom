@@ -10,8 +10,8 @@
 
 void FTankInput::Sanitize()
 {
-	MovementInput = RawMovementInput.ClampAxes(1.0f, 1.0f); // Gets total input and clamps it to a square
-	MovementInput.GetSafeNormal(); // Takes square input and shapes it down into a unit circle since x=1 and y=1 is outsiderange of unit circle
+	MovementInput = RawMovementInput.ClampAxes(-1.0f, 1.0f); // Gets total input and clamps it to a square
+	MovementInput = MovementInput.GetSafeNormal(); // Takes square input and shapes it down into a unit circle since x=1 and y=1 is outsiderange of unit circle
 	RawMovementInput.Set(0.0f, 0.0f); // Resets RawMovementInput so movement is not always in that direction
 }
 
@@ -83,7 +83,8 @@ void ATank::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	TankInput.Sanitize();
-	UE_LOG(LogTemp, Warning, TEXT("Movement: (%f %f)"), TankInput.MovementInput.X, TankInput.MovementInput.Y);
+
+
 }
 
 // Called to bind functionality to input

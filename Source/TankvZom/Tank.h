@@ -21,7 +21,7 @@ struct FTankInput
 public:
 	// Sanitized movement input, ready to be used by game logic. 
 	// (Handles issue of different keys with same purpose. eg: W and UP keys to move up make speed twice as fast)
-
+	 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TankInput")
 	FVector2D MovementInput;
 
