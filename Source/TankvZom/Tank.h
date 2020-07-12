@@ -8,6 +8,7 @@
 
 class UArrowComponent;
 class UPaperSpriteComponent;
+class UCameraComponent;
 
 UCLASS()
 class TANKVZOM_API ATank : public APawn
@@ -43,4 +44,8 @@ private:
 	// The actor used as the turret
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank", meta = (AllowPrivateAccess = "true"))
 	UChildActorComponent* ChildTurret;
+
+	// The in-game camera
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank", meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* CameraComponent;
 };

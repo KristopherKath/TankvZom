@@ -4,6 +4,8 @@
 #include "Tank.h"
 #include "PaperSpriteComponent.h"
 #include "Components/ArrowComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values
 ATank::ATank()
@@ -24,6 +26,26 @@ ATank::ATank()
 	// Sprite for tank body
 	TankSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("TankSprite"));
 	TankSprite->AttachToComponent(TankDirection, FAttachmentTransformRules::SnapToTargetNotIncludingScale, NAME_None);
+
+	// Spring Arm Component
+	USpringArmComponent* SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->TargetArmLength = 500.0f;
+	SpringArm->bEnableCameraLag = true;
+	SpringArm->bEnableCameraRotationLag = false;
+	SpringArm->bUsePawnControlRotation = false;
+	SpringArm->CameraLagSpeed = 2.0f;
+	SpringArm->bDoCollisionTest = false;
+	SpringArm->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, NAME_None);
+	SpringArm->SetWorldRotation(FRotator(-90.0f, 0.0f, 0.0f)); //Straight down rotation
+
+	//Camera Component
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComponent->bUsePawnControlRotation = false;
+	CameraComponent->ProjectionMode = ECameraProjectionMode::Orthographic; // Makes perspective flat view of objects
+	CameraComponent->OrthoWidth = 1024.0f; // The width in unreal units of the camera view
+	CameraComponent->AspectRatio = 3.0f / 4.0f; //width by height
+	CameraComponent->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetNotIncludingScale, USpringArmComponent::SocketName);
+	CameraComponent->SetWorldRotation(FRotator(-90.0f, 0.0f, 0.0f)); // Camera points downward
 
 	// Turret Attachement
 	ChildTurret = CreateDefaultSubobject<UChildActorComponent>(TEXT("Turret"));
