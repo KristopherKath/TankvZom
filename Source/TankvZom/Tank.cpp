@@ -6,6 +6,7 @@
 #include "Components/ArrowComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "TankStatics.h"
 
 
 void FTankInput::Sanitize()
@@ -84,7 +85,64 @@ void ATank::Tick(float DeltaTime)
 
 	TankInput.Sanitize();
 
+	// Move the tank
+	{
+		FVector DesiredMovementDirection = FVector(TankInput.MovementInput.X, TankInput.MovementInput.Y, 0.0f);
+		if (!DesiredMovementDirection.IsNearlyZero())
+		{
+			// Rotate the tank. Note that we rotate the TankDirection component,
+			// not the RootComponent.
+			FRotator MovementAngle = DesiredMovementDirection.Rotation(); // already normalized
+			float DeltaYaw = UTankStatics::FindDeltaAngleDegrees(TankDirection->GetComponentRotation().Yaw, MovementAngle.Yaw); // gets difference of what tank is facing to where it wants to face
+			bool bReverse = false;
+			if (DeltaYaw != 0.0f)
+			{
+				float AdjustedDeltaYaw = DeltaYaw;
 
+				if (AdjustedDeltaYaw < -90.0f)
+				{
+					AdjustedDeltaYaw += 180.0f;
+					bReverse = true;
+				}
+				else if (AdjustedDeltaYaw > 90.0f)
+				{
+					AdjustedDeltaYaw -= 180.0f;
+					bReverse = true;
+				}
+
+				// Turn toward the desired angle. Stop if we can get there in one frame.
+				float MaxYawThisFrame = YawSpeed * DeltaTime;
+				if (MaxYawThisFrame >= FMath::Abs(AdjustedDeltaYaw))
+				{
+					if (bReverse)
+					{
+						// Move backward
+						FRotator FacingAngle = MovementAngle;
+						FacingAngle.Yaw = MovementAngle.Yaw + 180.0f;
+						TankDirection->SetWorldRotation(FacingAngle);
+					}
+					else
+					{
+						TankDirection->SetWorldRotation(MovementAngle);
+					}
+				}
+				else
+				{
+					// Can't reach our desired angle this frame, rotate part way.
+					TankDirection->AddLocalRotation(FRotator(0.0f, FMath::Sign(AdjustedDeltaYaw) * MaxYawThisFrame, 0.0f));
+				}
+			}
+
+			// Move the tank
+			{
+				FVector MovementDirection = TankDirection->GetForwardVector() * (bReverse ? -1.0f : 1.0f);
+				FVector Pos = GetActorLocation();
+				Pos.X += MovementDirection.X * MoveSpeed * DeltaTime;
+				Pos.Y += MovementDirection.Y + MoveSpeed * DeltaTime;
+				SetActorLocation(Pos);
+			}
+		}
+	}
 }
 
 // Called to bind functionality to input
