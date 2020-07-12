@@ -7,6 +7,24 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
+
+void FTankInput::Sanitize()
+{
+	MovementInput = RawMovementInput.ClampAxes(1.0f, 1.0f); // Gets total input and clamps it to a square
+	MovementInput.GetSafeNormal(); // Takes square input and shapes it down into a unit circle since x=1 and y=1 is outsiderange of unit circle
+	RawMovementInput.Set(0.0f, 0.0f); // Resets RawMovementInput so movement is not always in that direction
+}
+
+void FTankInput::MoveX(float AxisValue)
+{
+	RawMovementInput.X += AxisValue;
+}
+
+void FTankInput::MoveY(float AxisValue)
+{
+	RawMovementInput.Y += AxisValue;
+}
+
 // Sets default values
 ATank::ATank()
 {
@@ -64,6 +82,8 @@ void ATank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	TankInput.Sanitize();
+	UE_LOG(LogTemp, Warning, TEXT("Movement: (%f %f)"), TankInput.MovementInput.X, TankInput.MovementInput.Y);
 }
 
 // Called to bind functionality to input
@@ -71,5 +91,18 @@ void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	// Name of axis assigned in editor input settings, on this tank, and reference to method to call
+	InputComponent->BindAxis("MoveX", this, &ATank::MoveX);
+	InputComponent->BindAxis("MoveY", this, &ATank::MoveY);
+
 }
 
+void ATank::MoveX(float AxisValue)
+{
+	TankInput.MoveX(AxisValue);
+}
+
+void ATank::MoveY(float AxisValue)
+{
+	TankInput.MoveY(AxisValue);
+}

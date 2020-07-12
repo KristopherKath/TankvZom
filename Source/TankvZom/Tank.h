@@ -10,6 +10,30 @@ class UArrowComponent;
 class UPaperSpriteComponent;
 class UCameraComponent;
 
+// This struct covers all possible tank input schemes.
+// What the inputs do can vary by tank, but the same inputs will always exist.
+// Have same keys, but keys may do something different depending on tank
+USTRUCT(BlueprintType)
+struct FTankInput
+{
+	GENERATED_BODY()
+
+public:
+	// Sanitized movement input, ready to be used by game logic. 
+	// (Handles issue of different keys with same purpose. eg: W and UP keys to move up make speed twice as fast)
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TankInput")
+	FVector2D MovementInput;
+
+	void Sanitize();
+	void MoveX(float AxisValue);
+	void MoveY(float AxisValue);
+
+private:
+	// Private because it's internal, raw data. Game code should never do this.
+	FVector2D RawMovementInput;
+};
+
 UCLASS()
 class TANKVZOM_API ATank : public APawn
 {
@@ -19,6 +43,10 @@ public:
 	// Sets default values for this pawn's properties
 	ATank();
 
+
+private:
+	void MoveX(float AxisValue);
+	void MoveY(float AxisValue);
 
 
 protected:
@@ -48,4 +76,11 @@ private:
 	// The in-game camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComponent;
+
+
+protected:
+
+	// Our input structure.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TankInput", meta = (AllowPrivateAccess = "true"))
+	FTankInput TankInput;
 };
