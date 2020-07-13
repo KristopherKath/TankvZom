@@ -84,10 +84,12 @@ void ATank::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	TankInput.Sanitize();
+	UE_LOG(LogTemp, Warning, TEXT("Movement: (%f %f)"), TankInput.MovementInput.X, TankInput.MovementInput.Y);
 
 	// Move the tank
 	{
 		FVector DesiredMovementDirection = FVector(TankInput.MovementInput.X, TankInput.MovementInput.Y, 0.0f);
+
 		if (!DesiredMovementDirection.IsNearlyZero())
 		{
 			// Rotate the tank. Note that we rotate the TankDirection component,
@@ -138,7 +140,7 @@ void ATank::Tick(float DeltaTime)
 				FVector MovementDirection = TankDirection->GetForwardVector() * (bReverse ? -1.0f : 1.0f);
 				FVector Pos = GetActorLocation();
 				Pos.X += MovementDirection.X * MoveSpeed * DeltaTime;
-				Pos.Y += MovementDirection.Y + MoveSpeed * DeltaTime;
+				Pos.Y += MovementDirection.Y * MoveSpeed * DeltaTime;
 				SetActorLocation(Pos);
 			}
 		}
